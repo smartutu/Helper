@@ -1,57 +1,40 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
+```yaml
+version: 2 # 修复：使用 version: 2 兼容 GoReleaser v2.12.0
+
 before:
   hooks:
-    # You may remove this if you don't use go modules.
-    - go mod tidy
-    # you may remove this if you don't need go generate
-    - go generate ./...
+    - go mod tidy # 保留，确保依赖一致
+
 builds:
   - env:
       - CGO_ENABLED=0
     goos:
-      - linux
-      - windows
-      - darwin
-      - freebsd
+      - linux # 仅编译 Linux
     goarch:
-      - 386
-      - amd64
-      - arm
-      - arm64
-      - mips
-      - mipsle
-      - mips64
-      - mips64le
+      - amd64 # 仅编译 AMD64
+    dir: ./cmd/douban # 主程序目录
+    main: ./main.go # 主程序文件
+    binary: douban # 输出文件名
+    ldflags:
+      - -s -w # 优化二进制大小
 
 archives:
-  - files:
-      - configs/*
-    format: tar.gz
-    # this name template makes the OS and Arch compatible with the results of uname.
-    name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
-    # use zip for windows archives
-    format_overrides:
-    - goos: windows
-      format: zip
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md # 可选，包含 README
+
+
 checksum:
-  name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  name_template: "{{ .ProjectName }}_checksums.txt"
+
 changelog:
   sort: asc
   filters:
-    exclude:
+    excluded: # v2 格式使用 excluded
       - '^docs:'
       - '^test:'
 
-# The lines beneath this are called `modelines`. See `:help modeline`
-# Feel free to remove those if you don't want/use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
+```
