@@ -1,12 +1,18 @@
-name: Build Linux AMD64 Binary
+name: goreleaser
+
 on:
   push:
+    # run only against tags
     tags:
       - '*'
+
 permissions:
   contents: write
+  # packages: write
+  # issues: write
+
 jobs:
-  build-linux-amd64:
+  goreleaser:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,19 +21,18 @@ jobs:
       - run: git fetch --force --tags
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: 'stable'
           cache: true
-      - name: Debug Go environment
-        run: |
-          go version
-          go env
-          ls -la
-          cat .goreleaser.yml
-          go list -m all
+      # More assembly might be required: Docker logins, GPG, etc. It all depends
+      # on your needs.
       - uses: goreleaser/goreleaser-action@v6
         with:
+          # either 'goreleaser' (default) or 'goreleaser-pro':
           distribution: goreleaser
-          version: '~> v2'
+          version: latest
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          # Your GoReleaser Pro key, if you are using the 'goreleaser-pro'
+          # distribution:
+          # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
