@@ -1,15 +1,12 @@
-name: goreleaser
+name: Build and Release Linux AMD64
 
 on:
   push:
-    # run only against tags
     tags:
       - '*'
 
 permissions:
   contents: write
-  # packages: write
-  # issues: write
 
 jobs:
   goreleaser:
@@ -21,18 +18,19 @@ jobs:
       - run: git fetch --force --tags
       - uses: actions/setup-go@v5
         with:
-          go-version: 'stable'
+          go-version: '1.21' # 明确 Go 版本
           cache: true
-      # More assembly might be required: Docker logins, GPG, etc. It all depends
-      # on your needs.
+      - name: Debug Go environment
+        run: |
+          go version
+          go env
+          ls -la
+          cat .goreleaser.yml
+          go list -m all
       - uses: goreleaser/goreleaser-action@v6
         with:
-          # either 'goreleaser' (default) or 'goreleaser-pro':
           distribution: goreleaser
-          version: latest
+          version: 'v2.12.0' # 明确版本，避免 latest 不稳定
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-          # Your GoReleaser Pro key, if you are using the 'goreleaser-pro'
-          # distribution:
-          # GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 使用默认 GITHUB_TOKEN
