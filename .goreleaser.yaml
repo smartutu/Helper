@@ -1,29 +1,33 @@
 ```yaml
-version: 2 # 修复：使用 version: 2 兼容 GoReleaser v2.12.0
+version: 2
 
 before:
   hooks:
-    - go mod tidy # 保留，确保依赖一致
+    - go mod tidy
 
 builds:
   - env:
       - CGO_ENABLED=0
     goos:
-      - linux # 仅编译 Linux
+      - linux
     goarch:
-      - amd64 # 仅编译 AMD64
-    dir: ./cmd/douban # 主程序目录
-    main: ./main.go # 主程序文件
-    binary: douban # 输出文件名
+      - amd64
+    dir: ./cmd/douban
+    main: ./main.go
+    binary: douban
     ldflags:
-      - -s -w # 优化二进制大小
+      - -s -w
 
 archives:
   - format: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     files:
-      - README.md # 可选，包含 README
+      - README.md
 
+release:
+  github:
+    owner: your-username # 替换为你的 GitHub 用户名
+    name: your-repo # 替换为你的仓库名
 
 checksum:
   name_template: "{{ .ProjectName }}_checksums.txt"
@@ -31,10 +35,7 @@ checksum:
 changelog:
   sort: asc
   filters:
-    excluded: # v2 格式使用 excluded
+    excluded:
       - '^docs:'
       - '^test:'
-
-# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
-# vim: set ts=2 sw=2 tw=0 fo=cnqoj
 ```
