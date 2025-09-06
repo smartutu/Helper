@@ -1,42 +1,57 @@
-
-version: 2
-
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
 before:
   hooks:
+    # You may remove this if you don't use go modules.
     - go mod tidy
-
+    # you may remove this if you don't need go generate
+    - go generate ./...
 builds:
   - env:
       - CGO_ENABLED=0
     goos:
       - linux
+      - windows
+      - darwin
+      - freebsd
     goarch:
+      - 386
       - amd64
-    dir: .
-    main: ./main.go
-    binary: douban
-    ldflags:
-      - -s -w
+      - arm
+      - arm64
+      - mips
+      - mipsle
+      - mips64
+      - mips64le
 
 archives:
-  - format: tar.gz
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    files:
-      - README.md
+  - files:
       - configs/*
-
-release:
-  github:
-    owner: your-username # 替换为你的 GitHub 用户名
-    name: your-repo # 替换为你的仓库名
-
+    format: tar.gz
+    # this name template makes the OS and Arch compatible with the results of uname.
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # use zip for windows archives
+    format_overrides:
+    - goos: windows
+      format: zip
 checksum:
-  name_template: "{{ .ProjectName }}_checksums.txt"
-
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
 changelog:
   sort: asc
   filters:
-    exclude: # 修复：改为 exclude
+    exclude:
       - '^docs:'
       - '^test:'
 
+# The lines beneath this are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
