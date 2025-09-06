@@ -1,3 +1,4 @@
+
 version: 2
 
 before:
@@ -11,7 +12,7 @@ builds:
       - linux
     goarch:
       - amd64
-    dir: ./cmd/douban
+    dir: .
     main: ./main.go
     binary: douban
     ldflags:
@@ -22,6 +23,7 @@ archives:
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     files:
       - README.md
+      - configs/*
 
 release:
   github:
@@ -34,6 +36,7 @@ checksum:
 changelog:
   sort: asc
   filters:
-    excluded:
+    exclude: # 修复：改为 exclude
       - '^docs:'
       - '^test:'
+
