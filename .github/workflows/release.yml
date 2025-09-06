@@ -1,40 +1,33 @@
-version: 2
-
-before:
-  hooks:
-    - go mod tidy
-
-builds:
-  - env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-    goarch:
-      - amd64
-    dir: .
-    main: ./main.go
-    binary: douban
-    ldflags:
-      - -s -w
-
-archives:
-  - format: tar.gz
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    files:
-      - README.md
-      - configs/*
-
-release:
-  github:
-    owner: your-username # 替换为你的 GitHub 用户名
-    name: your-repo # 替换为你的仓库名
-
-checksum:
-  name_template: "{{ .ProjectName }}_checksums.txt"
-
-changelog:
-  sort: asc
-  filters:
-    exclude: # 修复：改为 exclude
-      - '^docs:'
-      - '^test:'
+name: Build Linux AMD64 Binary
+on:
+  push:
+    tags:
+      - '*'
+permissions:
+  contents: write
+jobs:
+  build-linux-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: git fetch --force --tags
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+      - name: Debug Go environment
+        run: |
+          go version
+          go env
+          ls -la
+          cat .goreleaser.yml
+          go list -m all
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
