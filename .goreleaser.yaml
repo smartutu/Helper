@@ -1,4 +1,3 @@
-```yaml
 version: 2
 
 before:
@@ -38,4 +37,3 @@ changelog:
     excluded:
       - '^docs:'
       - '^test:'
-```
