@@ -1,3 +1,4 @@
+```yaml
 name: Build and Release Linux AMD64
 
 on:
@@ -18,19 +19,20 @@ jobs:
       - run: git fetch --force --tags
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.21' # 明确 Go 版本
+          go-version: '1.24' # 匹配 go1.24.4
           cache: true
       - name: Debug Go environment
         run: |
           go version
           go env
           ls -la
-          cat .goreleaser.yml
+          cat .goreleaser.yaml # 修复：使用 .yaml
           go list -m all
       - uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: 'v2.12.0' # 明确版本，避免 latest 不稳定
+          version: 'v2.12.0' # 明确版本
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 使用默认 GITHUB_TOKEN
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
